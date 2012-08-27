@@ -40,6 +40,8 @@ if not hasattr( pygccxml, '__revision__' ) or pygccxml.__revision__ < 1080:
           'Please install right pygccxml version.'
     raise AssertionError( msg % pygccxml.__revision__ )
 
+symap2ic_patched = True
+
 #Known issues:
 #3.
 #~ > > 2. An other difference: when `Py++` creates bindings for a set of
