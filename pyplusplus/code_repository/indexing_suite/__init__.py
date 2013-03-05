@@ -9,6 +9,9 @@ code repository for Indexing Suite V2 - std containers wrappers
 
 all = []
 
+from . import array_header
+all.append( array_header )
+
 from . import slice_header
 all.append( slice_header )
 
