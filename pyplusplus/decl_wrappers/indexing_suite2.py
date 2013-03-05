@@ -43,6 +43,7 @@ containers = {
       #, 'hash_multimap' : "indexing_suite/multimap.hpp"
       , 'set' : "indexing_suite/set.hpp"
       , 'hash_set' : "indexing_suite/set.hpp"
+      , 'array' : "indexing_suite/array.hpp"
     #TODO: queue, priority, stack, multiset, hash_multiset
 }
 
