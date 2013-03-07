@@ -128,8 +128,8 @@ namespace boost { namespace python { namespace indexing {
         supported_methods = (
               method_len
             | method_iter
-			| method_getitem
-			| method_setitem
+            | method_getitem
+            | method_getitem_slice
 
             | detail::method_set_if<
                   value_traits_type::equality_comparable,
@@ -141,7 +141,9 @@ namespace boost { namespace python { namespace indexing {
 
             | detail::method_set_if<
                   base_class::is_mutable,
-                  method_reverse
+                    method_reverse
+                  | method_setitem
+                  | method_setitem_slice
               >::value
 
             | detail::method_set_if<
