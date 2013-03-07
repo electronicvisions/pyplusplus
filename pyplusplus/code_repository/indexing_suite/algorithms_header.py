@@ -58,14 +58,15 @@ namespace boost { namespace python { namespace indexing {
     typedef ContainerTraits container_traits;
 
     // Import typedefs from the container_traits for convenience
-    typedef typename ContainerTraits::container   container;
-    typedef typename ContainerTraits::iterator    iterator;
-    typedef typename ContainerTraits::reference   reference;
-    typedef typename ContainerTraits::size_type   size_type;
-    typedef typename ContainerTraits::value_type  value_type;
-    typedef typename ContainerTraits::value_param value_param;
-    typedef typename ContainerTraits::index_param index_param;
-    typedef typename ContainerTraits::key_param   key_param;
+    typedef typename ContainerTraits::container      container;
+    typedef typename ContainerTraits::iterator       iterator;
+    typedef typename ContainerTraits::const_iterator const_iterator;
+    typedef typename ContainerTraits::reference      reference;
+    typedef typename ContainerTraits::size_type      size_type;
+    typedef typename ContainerTraits::value_type     value_type;
+    typedef typename ContainerTraits::value_param    value_param;
+    typedef typename ContainerTraits::index_param    index_param;
+    typedef typename ContainerTraits::key_param      key_param;
 
     // Defer selection of supported_methods to the ContainerTraits
     // template argument. This makes sense because default_algorithms
@@ -93,9 +94,13 @@ namespace boost { namespace python { namespace indexing {
     static void      push_back  (container &, value_param);
     static void      sort       (container &);
     //    static void      sort       (container &, PyObject *);
+    static bool      equal      (container &, const boost::python::object & obj);
 
     static iterator  begin      (container &c) { return c.begin(); }
     static iterator  end        (container &c) { return c.end(); }
+
+    static const_iterator  begin      (const container &c) { return c.begin(); }
+    static const_iterator  end        (const container &c) { return c.end(); }
 
     // Reasonable defaults for slice handling
     typedef int_slice_helper<self_type, integer_slice> slice_helper;
@@ -525,6 +530,33 @@ namespace boost { namespace python { namespace indexing {
       container &c, key_param key)
   {
     return c.count (key);
+  }
+
+  /////////////////////////////////////////////////////////////////////////
+  // Compares two container (std algorithm version)
+  /////////////////////////////////////////////////////////////////////////
+
+  template<typename ContainerTraits, typename Ovr>
+  bool
+  default_algorithms<ContainerTraits, Ovr>::equal(
+      container &c, const boost::python::object & obj)
+  {
+    typedef typename container_traits::value_traits_type vtraits;
+    typedef typename vtraits::equal_to comparison;
+
+	boost::python::extract<container> check(obj);
+	if (check.check())
+	{
+		const container & o = check();
+		if( c.size() != o.size() )
+			return false;
+		return std::equal(
+				most_derived::begin(c),
+				most_derived::end(c),
+				most_derived::begin(o),
+				comparison() );
+	}
+	return false;
   }
 
   /////////////////////////////////////////////////////////////////////////
