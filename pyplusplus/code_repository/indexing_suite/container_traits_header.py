@@ -83,6 +83,8 @@ namespace boost { namespace python { namespace indexing {
         BOOST_DEDUCED_TYPENAME container::iterator
       >::type iterator;
 
+    typedef BOOST_DEDUCED_TYPENAME container::const_iterator const_iterator;
+
     typedef typename ::boost::iterator_reference<iterator>::type reference;
 
     typedef value_type key_type; // Used for find, etc.
@@ -138,6 +140,7 @@ namespace boost { namespace python { namespace indexing {
                     method_index
                   | method_contains
                   | method_count
+                  | method_equal
               >::value
 
             | detail::method_set_if<

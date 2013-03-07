@@ -54,7 +54,8 @@ namespace boost { namespace python { namespace indexing {
     method_append         = 1UL << 13,
     method_insert         = 1UL << 14,
     method_extend         = 1UL << 15,
-    method_sort           = 1UL << 16
+    method_sort           = 1UL << 16,
+    method_equal          = 1UL << 17
   };
 
   // Some sets of methods that could be useful for disabling expensive

@@ -148,12 +148,17 @@ namespace boost { namespace python { namespace indexing {
       // Should maybe separate precall and postcall portions of the
       // policy (precall when generating the range object, postcall
       // when returing from range.next())?
+	  typedef BOOST_DEDUCED_TYPENAME Algorithms::iterator iterator;
+	  typedef BOOST_DEDUCED_TYPENAME Algorithms::container container;
+
+	  iterator (*begin)(container &) = Algorithms::begin;
+	  iterator (*end)(container &) = Algorithms::end;
 
       pyClass.def(
           "__iter__",
           boost::python::range<Policy>(
-              Algorithms::begin,
-              Algorithms::end));
+              begin,
+              end));
     }
   };
 
@@ -178,6 +183,7 @@ namespace boost { namespace python { namespace indexing {
   OPTIONAL_ALGO_SUPPORT  (maybe_add_count, "count", count);
   OPTIONAL_ALGO_SUPPORT  (maybe_add_contains, "__contains__", contains);
   OPTIONAL_ALGO_SUPPORT  (maybe_add_has_key, "has_key", contains);
+  OPTIONAL_ALGO_SUPPORT  (maybe_add_equal, "__eq__", equal);
 
   //////////////////////////////////////////////////////////////////////////
   // Do-all visitor
@@ -269,6 +275,10 @@ namespace boost { namespace python { namespace indexing {
 
       maybe_add_has_key<
         detail::is_member<enabled_methods, method_has_key>::value
+      >::apply (pyClass, algorithms_type(), precallPolicy);
+
+      maybe_add_equal<
+        detail::is_member<enabled_methods, method_equal>::value
       >::apply (pyClass, algorithms_type(), precallPolicy);
 
       Algorithms::visit_container_class (pyClass, m_policy);

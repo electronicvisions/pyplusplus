@@ -125,6 +125,7 @@ namespace boost { namespace python { namespace indexing {
                     method_contains
                   | method_count
                   | method_index
+                  | method_equal
               >::value
 
             | detail::method_set_if<
