@@ -105,25 +105,6 @@ namespace boost { namespace python { namespace indexing {
         ::type type;
     };
   }
-
-  template<typename T>
-  class has_compare
-  {
-  private:
-    // better match if SFINAE doesn't fail
-    typedef char true_type;
-    template<typename U>
-    static typename boost::enable_if_c<sizeof(&U::operator==), true_type>::type
-    test(char*);
-
-    typedef int false_type;
-    template<typename U>
-    static false_type test(...);
-  public:
-    static const bool value =
-        (sizeof(test<T>(NULL))==sizeof(true_type));
-  };
-
 } } }
 
 #endif // BOOST_PYTHON_INDEXING_SUITE_UTILS_HPP
