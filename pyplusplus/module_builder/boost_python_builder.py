@@ -322,7 +322,7 @@ class builder_t(module_builder.module_builder_t):
         body = self.code_creator.body
 
         for code in self.__registrations_code_tail:
-            body.adopt_creator( code_creators.custom_text_t( code ), -1 )
+            body.adopt_creator( code_creators.custom_text_t( code ), None)
 
         for code in self.__registrations_code_head:
             body.adopt_creator( code_creators.custom_text_t( code ), 0 )
