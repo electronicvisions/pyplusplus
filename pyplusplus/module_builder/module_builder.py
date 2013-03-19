@@ -55,254 +55,121 @@ class module_builder_t(object):
         decl_wrappers.print_declarations( decl, detailed, recursive, writer )
 
     #select decl(s) interfaces
-    def decl( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def decl( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.decl( name=name
-                                    , function=function
-                                    , header_dir=header_dir
-                                    , header_file=header_file
-                                    , recursive=recursive)
+        return self.global_ns.decl( *args, **kwargs )
 
-    def decls( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def decls( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.decls( name=name
-                                     , function=function
-                                     , header_dir=header_dir
-                                     , header_file=header_file
-                                     , recursive=recursive)
+        return self.global_ns.decls( *args, **kwargs )
 
-    def class_( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def class_( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.class_( name=name
-                                      , function=function
-                                      , header_dir=header_dir
-                                      , header_file=header_file
-                                      , recursive=recursive)
+        return self.global_ns.class_( *args, **kwargs )
 
-    def classes( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def classes( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.classes( name=name
-                                       , function=function
-                                       , header_dir=header_dir
-                                       , header_file=header_file
-                                       , recursive=recursive)
+        return self.global_ns.classes( *args, **kwargs )
 
-    def variable( self, name=None, function=None, type=None, header_dir=None, header_file=None, recursive=None ):
+    def variable( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.variable( name=name
-                                        , function=function
-                                        , type=type
-                                        , header_dir=header_dir
-                                        , header_file=header_file
-                                        , recursive=recursive)
+        return self.global_ns.variable( *args, **kwargs )
+
     var = variable
 
-    def variables( self, name=None, function=None, type=None, header_dir=None, header_file=None, recursive=None ):
+    def variables( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.variables( name=name
-                                         , function=function
-                                         , type=type
-                                         , header_dir=header_dir
-                                         , header_file=header_file
-                                         , recursive=recursive)
+        return self.global_ns.variables( *args, **kwargs )
+
     vars = variables
 
-    def calldef( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def calldef( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.calldef( name=name
-                                       , function=function
-                                       , return_type=return_type
-                                       , arg_types=arg_types
-                                       , header_dir=header_dir
-                                       , header_file=header_file
-                                       , recursive=recursive )
+        return self.global_ns.calldef( *args, **kwargs )
 
-    def calldefs( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def calldefs( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.calldefs( name=name
-                                        , function=function
-                                        , return_type=return_type
-                                        , arg_types=arg_types
-                                        , header_dir=header_dir
-                                        , header_file=header_file
-                                        , recursive=recursive)
+        return self.global_ns.calldefs( *args, **kwargs )
 
-    def operator( self, name=None, symbol=None, return_type=None, arg_types=None, decl_type=None, header_dir=None, header_file=None, recursive=None ):
+    def operator( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.operator( name=name
-                                        , symbol=symbol
-                                        , return_type=return_type
-                                        , arg_types=arg_types
-                                        , header_dir=header_dir
-                                        , header_file=header_file
-                                        , recursive=recursive )
+        return self.global_ns.operator( *args, **kwargs )
 
-    def operators( self, name=None, symbol=None, return_type=None, arg_types=None, decl_type=None, header_dir=None, header_file=None, recursive=None ):
+    def operators( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.operators( name=name
-                                         , symbol=symbol
-                                         , return_type=return_type
-                                         , arg_types=arg_types
-                                         , header_dir=header_dir
-                                         , header_file=header_file
-                                         , recursive=recursive )
+        return self.global_ns.operators( *args, **kwargs )
 
-    def member_function( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def member_function( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.member_function( name=name
-                                               , function=function
-                                               , return_type=return_type
-                                               , arg_types=arg_types
-                                               , header_dir=header_dir
-                                               , header_file=header_file
-                                               , recursive=recursive )
+        return self.global_ns.member_function( *args, **kwargs )
+
     mem_fun = member_function
 
-    def member_functions( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def member_functions( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.member_functions( name=name
-                                                , function=function
-                                                , return_type=return_type
-                                                , arg_types=arg_types
-                                                , header_dir=header_dir
-                                                , header_file=header_file
-                                                , recursive=recursive)
+        return self.global_ns.member_functions( *args, **kwargs )
 
     mem_funs = member_functions
 
-    def constructor( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def constructor( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.constructor( name=name
-                                           , function=function
-                                           , return_type=return_type
-                                           , arg_types=arg_types
-                                           , header_dir=header_dir
-                                           , header_file=header_file
-                                           , recursive=recursive )
+        return self.global_ns.constructor( *args, **kwargs )
 
-    def constructors( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def constructors( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.constructors( name=name
-                                            , function=function
-                                            , return_type=return_type
-                                            , arg_types=arg_types
-                                            , header_dir=header_dir
-                                            , header_file=header_file
-                                            , recursive=recursive)
+        return self.global_ns.constructors( *args, **kwargs )
 
-    def member_operator( self, name=None, function=None, symbol=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def member_operator( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.member_operator( name=name
-                                               , symbol=symbol
-                                               , function=function
-                                               , return_type=return_type
-                                               , arg_types=arg_types
-                                               , header_dir=header_dir
-                                               , header_file=header_file
-                                               , recursive=recursive )
+        return self.global_ns.member_operator( *args, **kwargs )
 
-    def member_operators( self, name=None, function=None, symbol=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def member_operators( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.member_operators( name=name
-                                                , symbol=symbol
-                                                , function=function
-                                                , return_type=return_type
-                                                , arg_types=arg_types
-                                                , header_dir=header_dir
-                                                , header_file=header_file
-                                                , recursive=recursive )
+        return self.global_ns.member_operators( *args, **kwargs )
 
-    def casting_operator( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def casting_operator( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.casting_operator( name=name
-                                                , function=function
-                                                , return_type=return_type
-                                                , arg_types=arg_types
-                                                , header_dir=header_dir
-                                                , header_file=header_file
-                                                , recursive=recursive )
+        return self.global_ns.casting_operator( *args, **kwargs )
 
-    def casting_operators( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def casting_operators( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.casting_operators( name=name
-                                                 , function=function
-                                                 , return_type=return_type
-                                                 , arg_types=arg_types
-                                                 , header_dir=header_dir
-                                                 , header_file=header_file
-                                                 , recursive=recursive)
+        return self.global_ns.casting_operators( *args, **kwargs )
 
-    def enumeration( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def enumeration( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.enumeration( name=name
-                                           , function=function
-                                           , header_dir=header_dir
-                                           , header_file=header_file
-                                           , recursive=recursive)
+        return self.global_ns.enumeration( *args, **kwargs )
     enum = enumeration
 
-    def enumerations( self, name=None, function=None, header_dir=None, header_file=None, recursive=None ):
+    def enumerations( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.scopedef_t` class documentation"""
-        return self.global_ns.enumerations( name=name
-                                            , function=function
-                                            , header_dir=header_dir
-                                            , header_file=header_file
-                                            , recursive=recursive)
+        return self.global_ns.enumerations( *args, **kwargs )
 
     enums = enumerations
 
-    def namespace( self, name=None, function=None, recursive=None ):
+    def namespace( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.namespace( name=name
-                                         , function=function
-                                         , recursive=recursive )
+        return self.global_ns.namespace( *args, **kwargs )
 
-    def namespaces( self, name=None, function=None, recursive=None ):
+    def namespaces( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.namespaces( name=name
-                                          , function=function
-                                          , recursive=recursive )
+        return self.global_ns.namespaces( *args, **kwargs )
 
-    def free_function( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def free_function( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.free_function( name=name
-                                             , function=function
-                                             , return_type=return_type
-                                             , arg_types=arg_types
-                                             , header_dir=header_dir
-                                             , header_file=header_file
-                                             , recursive=recursive )
+        return self.global_ns.free_function( *args, **kwargs )
+
     free_fun = free_function
 
-    def free_functions( self, name=None, function=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def free_functions( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.free_functions( name=name
-                                              , function=function
-                                              , return_type=return_type
-                                              , arg_types=arg_types
-                                              , header_dir=header_dir
-                                              , header_file=header_file
-                                              , recursive=recursive)
+        return self.global_ns.free_functions( *args, **kwargs )
+
     free_funs = free_functions
 
-    def free_operator( self, name=None, function=None, symbol=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def free_operator( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.free_operator( name=name
-                                             , symbol=symbol
-                                             , function=function
-                                             , return_type=return_type
-                                             , arg_types=arg_types
-                                             , header_dir=header_dir
-                                             , header_file=header_file
-                                             , recursive=recursive )
+        return self.global_ns.free_operator( *args, **kwargs )
 
-    def free_operators( self, name=None, function=None, symbol=None, return_type=None, arg_types=None, header_dir=None, header_file=None, recursive=None ):
+    def free_operators( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
-        return self.global_ns.free_operators( name=name
-                                              , symbol=symbol
-                                              , function=function
-                                              , return_type=return_type
-                                              , arg_types=arg_types
-                                              , header_dir=header_dir
-                                              , header_file=header_file
-                                              , recursive=recursive )
+        return self.global_ns.free_operators( *args, **kwargs )
