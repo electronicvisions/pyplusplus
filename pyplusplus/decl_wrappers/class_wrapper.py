@@ -423,7 +423,17 @@ class class_t( class_common_details_t
         """returns list of internal declarations that should\\could be exported"""
         #TODO: obviously this function should be shorter. Almost all logic of this class
         #      should be spread between decl_wrapper classes
-        members = filter( lambda mv: mv.ignore == False and mv.exportable, self.public_members )
+        def is_exportable( decl ):
+            #filter out non-public member operators - `Py++` does not support them right now
+            if isinstance( decl, declarations.member_operator_t ) \
+               and decl.access_type != declarations.ACCESS_TYPES.PUBLIC:
+                return False
+            if decl.ignore == True or decl.exportable == False:
+                return False
+            return True
+
+        members = list(self.public_members)
+
         #protected and private virtual functions that not overridable and not pure
         #virtual should not be exported
         for member in self.protected_members:
@@ -436,17 +446,6 @@ class class_t( class_common_details_t
                                             and member.virtuality == declarations.VIRTUALITY_TYPES.PURE_VIRTUAL
         members.extend( filter( vfunction_selector, self.private_members ) )
 
-        def is_exportable( decl ):
-            #filter out non-public member operators - `Py++` does not support them right now
-            if isinstance( decl, declarations.member_operator_t ) \
-               and decl.access_type != declarations.ACCESS_TYPES.PUBLIC:
-                return False
-            #remove artificial constructors
-            if isinstance( decl, declarations.constructor_t ) and decl.is_artificial:
-                return False
-            if decl.ignore == True or decl.exportable == False:
-                return False
-            return True
         #-#if declarations.has_destructor( self ) \
         #-#   and not declarations.has_public_destructor( self ):
         members = filter( is_exportable, members )
