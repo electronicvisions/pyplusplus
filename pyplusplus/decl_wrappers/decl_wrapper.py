@@ -95,6 +95,8 @@ class decl_wrapper_t(object):
                         self._alias = algorithm.create_valid_name( self.partial_name )
                     else:
                         self._alias = self.partial_name
+        if callable(self._alias):
+            return self._alias()
         return self._alias
     def _set_alias(self, alias):
         self._alias = alias
