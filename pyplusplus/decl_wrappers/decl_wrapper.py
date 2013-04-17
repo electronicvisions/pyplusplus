@@ -83,13 +83,7 @@ class decl_wrapper_t(object):
                 self._alias = directives[0].name
             else:
                 if declarations.templates.is_instantiation( self.name ):
-                    container_aliases = [ 'value_type', 'key_type', 'mapped_type' ]
-                    if isinstance( self, declarations.class_t ) \
-                        and 1 == len( set( [typedef.name for typedef in self.aliases] ) ) \
-                        and self.aliases[0].name not in container_aliases:
-                            self._alias = self.aliases[0].name
-                    else:
-                        self._alias = algorithm.create_valid_name( self.partial_name )
+                    self._alias = algorithm.create_valid_name( self.partial_name )
                 else:
                     if declarations.is_class( self ) or declarations.is_class_declaration( self ):
                         self._alias = algorithm.create_valid_name( self.partial_name )
