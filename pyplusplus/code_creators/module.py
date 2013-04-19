@@ -223,7 +223,7 @@ class bpmodule_t(module_t):
     def adopt_declaration_creator( self, creator ):
         self.adopt_creator( creator, self.creators.index( self.body ) )
 
-    def add_declaration_code( self, code, position ):
+    def add_declaration_code( self, code, position=None ):
         self.adopt_declaration_creator( custom.custom_text_t( code ) )
 
 

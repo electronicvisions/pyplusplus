@@ -60,5 +60,4 @@ class balanced_files_t(multiple_files.multiple_files_t):
         for index, bucket in enumerate( buckets ):
             self.split_creators( bucket
                                  , '_classes_%d' % (index+1)
-                                 , 'register_classes_%d' % (index+1)
-                                 , -1 )
+                                 , 'register_classes_%d' % (index+1) )

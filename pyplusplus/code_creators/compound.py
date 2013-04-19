@@ -30,11 +30,14 @@ class compound_t(code_creator.code_creator_t):
         :param index: Desired position of the creator or None to append it to the end of the list
         :type index: int
         """
+        self._adopt_creator(creator, self._creators, index)
+
+    def _adopt_creator(self, creator, l, index):
         creator.parent = self
         if index or index == 0:
-            self._creators.insert( index, creator )
+            l.insert( index, creator )
         else:
-            self._creators.append( creator )
+            l.append( creator )
 
     def adopt_creators( self, creators, index=None):
         """Add a creators to the list of children creators.
@@ -44,11 +47,15 @@ class compound_t(code_creator.code_creator_t):
         :param index: Desired position of the creator or None to append it to the end of the list
         :type index: int
         """
-        for pos, creator in enumerate( creators ):
-            if index or index == 0:
-                self.adopt_creator( creator, index + pos )
-            else:
-                self.adopt_creator( creator )
+        self._adopt_creators(creators, self._creators, index)
+
+    def _adopt_creators(self, creators, l, index=None):
+        if index or index == 0:
+            for creator in reversed(creators):
+                self._adopt_creator(creator, l, index)
+        else:
+            for creator in creators:
+                self._adopt_creator(creator, l, index)
 
     def remove_creator( self, creator ):
         """Remove a children code creator object.
