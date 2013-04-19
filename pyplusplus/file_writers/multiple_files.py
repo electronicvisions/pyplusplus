@@ -320,7 +320,7 @@ class multiple_files_t(writer.writer_t):
     def split_values_traits( self ):
         for trait in self.__value_traits: self.split_value_traits(trait)
 
-    def split_creators( self, creators, pattern, function_name, registrator_pos ):
+    def split_creators( self, creators, pattern, function_name, registrator_pos=None):
         """Write non-class creators into a particular .h/.cpp file.
 
         :param creators: The code creators that should be written
@@ -359,21 +359,21 @@ class multiple_files_t(writer.writer_t):
         """
         enums_creators = [x for x in self.extmodule.body.creators if isinstance(x, code_creators.enum_t )]
 
-        self.split_creators( enums_creators, '_enumerations', 'register_enumerations', 0 )
+        self.split_creators( enums_creators, '_enumerations', 'register_enumerations')
 
     def split_global_variables( self ):
         """Write all global variables into a separate .h/.cpp file.
         """
         creators = [x for x in self.extmodule.body.creators if isinstance(x, code_creators.global_variable_t )]
         creators.extend( [x for x in self.extmodule.body.creators if isinstance(x, code_creators.unnamed_enum_t )] )
-        self.split_creators( creators, '_global_variables', 'register_global_variables', -1 )
+        self.split_creators( creators, '_global_variables', 'register_global_variables')
 
     def split_free_functions( self ):
         """Write all free functions into a separate .h/.cpp file.
         """
         free_functions = ( code_creators.free_function_t, code_creators.free_fun_overloads_t )
         creators = [x for x in self.extmodule.body.creators if isinstance(x, free_functions )]
-        self.split_creators( creators, '_free_functions', 'register_free_functions', -1 )
+        self.split_creators( creators, '_free_functions', 'register_free_functions')
 
     def write(self):
         """

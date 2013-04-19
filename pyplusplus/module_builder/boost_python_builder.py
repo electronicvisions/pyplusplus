@@ -314,18 +314,18 @@ class builder_t(module_builder.module_builder_t):
 
     def __merge_user_code( self ):
         for code in self.__declarations_code_tail:
-            self.code_creator.add_declaration_code( code, -1 )
+            self.code_creator.add_declaration_code(code, -1)
 
         for code in self.__declarations_code_head:
-            self.code_creator.add_declaration_code( code, 0 )
+            self.code_creator.add_declaration_code(code, 0)
 
         body = self.code_creator.body
 
         for code in self.__registrations_code_tail:
-            body.adopt_creator( code_creators.custom_text_t( code ), None)
+            body.adopt_tail_creator(code_creators.custom_text_t( code ))
 
         for code in self.__registrations_code_head:
-            body.adopt_creator( code_creators.custom_text_t( code ), 0 )
+            body.adopt_head_creator(code_creators.custom_text_t( code ))
 
 
     def write_module( self, file_name ):
