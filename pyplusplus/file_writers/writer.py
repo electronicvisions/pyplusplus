@@ -156,10 +156,9 @@ class writer_t(object):
 
     def get_user_headers( self, creators ):
         headers = []
-        creators = filter( lambda creator: isinstance( creator, code_creators.declaration_based_t )
-                           , creators )
-        map( lambda creator: headers.extend( creator.get_user_headers() )
-             , creators )
+        for creator in code_creators.make_flatten_generator(creators):
+            if isinstance( creator, code_creators.declaration_based_t ):
+                headers.extend(creator.get_user_headers())
         return code_creators.code_creator_t.unique_headers( headers )
 
     def save_exposed_decls_db( self, file_path ):
