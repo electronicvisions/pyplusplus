@@ -157,5 +157,6 @@ from bookmark import bookmark_t
 from library_reference import library_reference_t
 from name_mappings import name_mappings_t
 
+from typedef import typedef_t
 from typedef_as_pyvar import typedef_as_pyvar_t
 from embedded_code_repository import embedded_code_repository_t
