@@ -6,7 +6,10 @@
 """defines class that configure typedef exposing"""
 
 from pygccxml import declarations
+from pygccxml.declarations import type_traits
+from pyplusplus import messages
 from . import decl_wrapper
+from . import class_wrapper
 
 class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
     """defines a set of properties, that will instruct `Py++` how to expose the typedef
@@ -19,7 +22,21 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
     def __init__(self, *arguments, **keywords):
         declarations.typedef_t.__init__(self, *arguments, **keywords )
         decl_wrapper.decl_wrapper_t.__init__( self )
+        self._target_decl = None
         self.__is_directive = None
+
+    def _exportable_impl( self ):
+        if not isinstance(self.target_decl, class_wrapper.class_t):
+            return messages.W1066 % str( self )
+        elif not self.target_decl.exportable:
+            return messages.W1067 % str( self )
+        return ''
+
+    @property
+    def target_decl(self):
+        if self._target_decl is None:
+            self._target_decl = type_traits.remove_declarated(self.type)
+        return self._target_decl
 
     @property
     def is_directive( self ):

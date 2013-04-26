@@ -257,6 +257,11 @@ W1065 = code_generation_error(
             'Use `wrapper_alias` property to change class wrapper alias value'
             'Other classes : %s' )
 
+W1066 = compilation_error( '`Py++` can not expose typdef "%s", only typedefs pointing to '
+                           ' a class are currently implemented.')
+
+W1067 = compilation_error( '`Py++` can not expose typdef "%s", because its target is not exportable.')
+
 warnings = globals()
 
 all_warning_msgs = []

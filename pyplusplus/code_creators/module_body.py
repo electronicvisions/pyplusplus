@@ -46,7 +46,7 @@ class module_body_t(compound.compound_t):
         """
         self._adopt_creator(creator, self.tail_creators, index)
 
-    def adopt_tail_creators(self, creator, index=None):
+    def adopt_tail_creators(self, creators, index=None):
         """Add a creators to the list of children creators.
         The code will be placed in the tail section of the body.
 

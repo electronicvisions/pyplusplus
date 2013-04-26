@@ -665,6 +665,8 @@ class bpcreator_t( declarations.decl_visitor_t ):
         pass
 
     def visit_typedef(self):
+        maker = code_creators.typedef_t(self.curr_decl)
+        self.__module_body.adopt_tail_creator(maker)
         pass
 
     def _register_array_1( self, array_type ):
