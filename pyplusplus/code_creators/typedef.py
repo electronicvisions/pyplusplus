@@ -14,18 +14,46 @@ class typedef_t( registration_based.registration_based_t
     """
     create code that exposes C++ typdefs
     """
+    INT_TYPES = (
+            declarations.char_t,
+            declarations.signed_char_t,
+            declarations.unsigned_char_t,
+            declarations.wchar_t,
+            declarations.short_int_t,
+            declarations.short_unsigned_int_t,
+            declarations.int_t,
+            declarations.unsigned_int_t,
+            declarations.long_int_t,
+            declarations.long_unsigned_int_t,
+            declarations.long_long_int_t,
+            declarations.long_long_unsigned_int_t,
+    )
+    FLOAT_TYPES = (
+            declarations.float_t,
+            declarations.double_t,
+            declarations.long_double_t,
+    )
     def __init__(self, typedef):
         registration_based.registration_based_t.__init__( self )
         declaration_based.declaration_based_t.__init__( self, declaration=typedef)
         self.works_on_instance = False
 
     def _gen_attr_access(self, decl):
-        ret = []
-        while not isinstance(decl, declarations.namespace_t):
-            ret.append('attr("%s")' % decl.alias)
-            decl = decl.parent
-        ret.append('::boost::python::scope()')
-        return ".".join(reversed(ret))
+
+        # Schauder .... (don't know how to make it poperly :( )
+        if isinstance(decl, declarations.bool_t):
+            return '::boost::python::eval("bool")'
+        elif isinstance(decl, self.INT_TYPES):
+            return '::boost::python::eval("int")'
+        elif isinstance(decl, self.FLOAT_TYPES):
+            return '::boost::python::eval("float")'
+        else:
+            ret = []
+            while not isinstance(decl, declarations.namespace_t):
+                ret.append('attr("%s")' % decl.alias)
+                decl = decl.parent
+            ret.append('::boost::python::scope()')
+            return ".".join(reversed(ret))
 
     def _create_impl(self):
         if self.declaration.already_exposed:
@@ -45,29 +73,6 @@ class typedef_t( registration_based.registration_based_t
         typedef_code.append('}')
 
         return os.linesep.join(typedef_code)
-
-        bpl_enum = '%(bpl::enum_)s< %(name)s>("%(alias)s")' \
-                   % { 'bpl::enum_' : algorithm.create_identifier( self, '::boost::python::enum_' )
-                       , 'name' : algorithm.create_identifier( self, self.declaration.decl_string )
-                       , 'alias' : self.alias }
-
-        values = []
-        # Add the values that should be exported
-        for value_name in self.declaration.export_values:
-            values.append( self._generate_value_code( value_name ) )
-
-        # Export the values
-        if len(self.declaration.export_values)>0:
-            values.append( '.export_values()' )
-
-        # Add the values that should not be exported
-        for name in self.declaration.no_export_values:
-            values.append( self._generate_value_code( name ) )
-
-        values.append( ';' )
-
-        values = self.indent( os.linesep.join( values ) )
-        return bpl_enum + os.linesep + values
 
     def _get_system_files_impl( self ):
         return []
