@@ -78,6 +78,7 @@ def create_valid_name(name):
         , '='  : '_equal_'
         , '.'  : '_dot_'
         , '$'  : '_dollar_'
+        , '-'  : '_minus_'
     }
     for orig, dest in replace_table.items():
         name = name.replace( orig, dest )
