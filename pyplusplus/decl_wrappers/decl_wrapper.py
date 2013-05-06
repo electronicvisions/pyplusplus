@@ -57,38 +57,15 @@ class decl_wrapper_t(object):
             name = self.name
         return algorithm.create_valid_name( name )
 
-    def __select_alias_directives( self, be_smart ):
-        if not isinstance( self, declarations.class_types ):
-            return []
-        typedefs = list( set( filter( lambda typedef: typedef.is_directive, self.aliases ) ) )
-        if decl_wrapper_t.SPECIAL_TYPEDEF_PICK_ANY:
-            if typedefs and be_smart:
-                longest_name_len = 0
-                longest_typedef = None
-                for typedef in typedefs:
-                    typedef_name_len = len( typedef.name )
-                    if longest_name_len < typedef_name_len:
-                        longest_name_len = typedef_name_len
-                        longest_typedef = typedef
-                return [longest_typedef]
-            else:
-                return typedefs
-        else:
-            return typedefs
-
     def _get_alias(self):
         if not self._alias:
-            directives = self.__select_alias_directives(be_smart=True)
-            if 1 == len( directives ):
-                self._alias = directives[0].name
+            if declarations.templates.is_instantiation( self.name ):
+                self._alias = algorithm.create_valid_name( self.partial_name )
             else:
-                if declarations.templates.is_instantiation( self.name ):
+                if declarations.is_class( self ) or declarations.is_class_declaration( self ):
                     self._alias = algorithm.create_valid_name( self.partial_name )
                 else:
-                    if declarations.is_class( self ) or declarations.is_class_declaration( self ):
-                        self._alias = algorithm.create_valid_name( self.partial_name )
-                    else:
-                        self._alias = self.partial_name
+                    self._alias = self.partial_name
         if callable(self._alias):
             return self._alias()
         return self._alias
@@ -189,11 +166,6 @@ class decl_wrapper_t(object):
         if declarations.templates.is_instantiation( self.name ) \
            and self.alias == self._generate_valid_name():
             msgs.append( messages.W1043 % self.alias )
-
-        directives = self.__select_alias_directives(be_smart=False)
-        if 1 < len( directives ):
-            msgs.append( messages.W1048
-                         % ( self.alias, ', '.join( map( lambda typedef: typedef.name, directives ) ) ) )
 
         msgs.extend( self._readme_impl() )
 
