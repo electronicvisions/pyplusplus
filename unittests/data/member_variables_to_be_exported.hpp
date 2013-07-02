@@ -128,8 +128,10 @@ struct fundamental_t{
     const int& m_i;
 };
 
-struct A{};
-
+struct A
+{
+	int data;
+};
 
 struct B {
  B( A& a_ ): a( a_ ){}
@@ -139,6 +141,11 @@ struct B {
 struct C {
  C( A& a_ ): a( a_ ){}
  const A& a;
+};
+
+struct D {
+ D( A& a_ ): a( a_ ){}
+ A& a;
 };
 
 }

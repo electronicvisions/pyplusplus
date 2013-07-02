@@ -61,42 +61,54 @@ class member_variable_t( member_variable_base_t ):
         sep = self.indent(os.linesep + self.PARAM_SEPARATOR, 3)
         return fn + '(' + sep.join(args) + ')'
 
-
-    #>    On Wednesday, 19. April 2006 23:05, Ralf W. Grosse-Kunstleve wrote:
-    #>   .add_property("p", make_function(&A::get_p, return_value_policy<reference_existing_object>()))
-    def _generate_for_pointer( self ):
+    def _create_with_property( self ):
         name = '"%s"' % self.alias
 
-        #according to David Abrahams:
-        #http://mail.python.org/pipermail/c++-sig/2003-January/003276.html
-        call_pol = call_policies.return_internal_reference().create( self )
-        make_function = algorithm.create_identifier( self, '::boost::python::make_function' )
+        if self.wrapper:
+            make_getter = algorithm.create_identifier( self, '::boost::python::make_function' )
+            make_setter = algorithm.create_identifier( self, '::boost::python::make_function' )
 
-        getter = '%(mk_func)s( (%(getter_type)s)(&%(wfname)s), %(call_pol)s )' % {
-                             'mk_func' : make_function
-                           , 'getter_type' : self.wrapper.getter_type.decl_string
-                           , 'wfname' : self.wrapper.getter_full_name
-                           , 'call_pol' : call_pol }
+            getter_args = ['(%(getter_type)s)(&%(wfname)s)' % {
+                'getter_type' : self.wrapper.getter_type.decl_string,
+                'wfname' : self.wrapper.getter_full_name }]
+            setter_args = ['(%(setter_type)s)(&%(wfname)s)' % {
+                'setter_type' : self.wrapper.setter_type.decl_string,
+                'wfname' : self.wrapper.setter_full_name,}
+            ]
+            if self.declaration.getter_call_policies:
+                getter_args.append(self.declaration.getter_call_policies.create(self))
+
+            if declarations.is_pointer( self.declaration.type ):
+                getter_args = getter_args[:1] + [call_policies.return_internal_reference().create( self )]
+                if not self.declaration.type_qualifiers.has_static:
+                    setter_args.append(call_policies.with_custodian_and_ward_postcall( 1, 2 ).create(self))
+            has_setter = self.wrapper.has_setter
+        else:
+            make_getter = algorithm.create_identifier( self, '::boost::python::make_getter')
+            make_setter = algorithm.create_identifier( self, '::boost::python::make_setter')
+            getter_args = ['&' + self.decl_identifier,
+                    self.declaration.getter_call_policies.create( self )]
+            setter_args = [ '&' + self.decl_identifier ]
+            has_setter = self.declaration.is_read_only
+
+        getter = '%(mk_func)s(%(args)s)' % {
+                'mk_func' : make_getter,
+                'args' : self.indent(self.PARAM_SEPARATOR, 6).join(getter_args)}
+
         setter = None
-        #don't generate setter method, right now I don't know how to do it.
         if self.wrapper.has_setter:
-            call_pol = ''
-            if not self.declaration.type_qualifiers.has_static:
-                call_pol = ", " + call_policies.with_custodian_and_ward_postcall( 1, 2 ).create(self)
-            setter = '%(mk_func)s( (%(setter_type)s)(&%(wfname)s)%(call_pol)s )' % {
-                             'mk_func' : make_function
-                           , 'setter_type' : self.wrapper.setter_type.decl_string
-                           , 'wfname' : self.wrapper.setter_full_name
-                           , 'call_pol' : call_pol }
+            setter = '%(mk_func)s(%(args)s)' % {
+                    'mk_func' : make_setter,
+                    'args' : self.indent(self.PARAM_SEPARATOR, 6).join(setter_args)}
 
         return self._create_property(name, getter, setter)
 
-    def _generate_for_none_pointer( self ):
+    def _create_with_def( self ):
         tmpl = None
         if self.declaration.type_qualifiers.has_static:
-            tmpl = '%(access)s( "%(alias)s", %(name)s%(doc)s )'
+            tmpl = '%(access)s("%(alias)s", %(name)s%(doc)s )'
         else:
-            tmpl = '%(access)s( "%(alias)s", &%(name)s%(doc)s )'
+            tmpl = '%(access)s("%(alias)s", &%(name)s%(doc)s )'
 
         access = 'def_readwrite'
         if self.declaration.is_read_only:
@@ -112,101 +124,15 @@ class member_variable_t( member_variable_base_t ):
 
         return result
 
-    def _generate_using_functions( self ):
-        doc = ''
-        add_property = ''
-        make_getter = algorithm.create_identifier( self, '::boost::python::make_getter')
-        make_setter = algorithm.create_identifier( self, '::boost::python::make_setter')
-        if self.declaration.type_qualifiers.has_static:
-            add_property = 'add_static_property'
-        else:
-            if self.documentation:
-                doc = self.documentation
-            add_property = 'add_property'
-        add_property_args = [ '"%s"' % self.alias ]
-        getter_code = declarations.call_invocation.join(
-                          make_getter
-                        , [ '&' + self.decl_identifier
-                            , self.declaration.getter_call_policies.create( self ) ]
-                        , os.linesep + self.indent( self.PARAM_SEPARATOR, 6) )
-
-        add_property_args.append( getter_code )
-        if not self.declaration.is_read_only:
-            setter_code = ''
-            setter_args = [ '&' + self.decl_identifier ]
-            if self.declaration.setter_call_policies \
-               and not self.declaration.setter_call_policies.is_default():
-                   setter_args.append( self.declaration.setter_call_policies.create( self ) )
-            setter_code = declarations.call_invocation.join(
-                              make_setter
-                            , setter_args
-                            , os.linesep + self.indent( self.PARAM_SEPARATOR, 6) )
-            add_property_args.append( setter_code)
-        if doc:
-            add_property_args.append( doc )
-        return declarations.call_invocation.join(
-                    add_property
-                    , add_property_args
-                    , os.linesep + self.indent( self.PARAM_SEPARATOR, 4 ) )
-
     def _create_impl( self ):
         if declarations.is_pointer( self.declaration.type ):
-            return self._generate_for_pointer()
+            return self._create_with_property()
+        if declarations.is_reference( self.declaration.type ):
+            return self._create_with_property()
         elif self.declaration.apply_smart_ptr_wa or self.declaration.use_make_functions:
-            return self._generate_using_functions()
+            return self._create_with_property()
         else:
-            return self._generate_for_none_pointer()
-
-class mem_var_ref_t( member_variable_base_t ):
-    """
-    creates get/set accessors for class member variable, that has type reference.
-    """
-
-    def __init__(self, variable, wrapper ):
-        member_variable_base_t.__init__( self, variable=variable, wrapper=wrapper )
-        self.param_sep = os.linesep + self.indent( self.PARAM_SEPARATOR, 2 )
-        self.works_on_instance = False
-
-    def _create_def(self, args):
-        return "def(" + self.param_sep.join(args) + ")"
-
-    def _create_getter( self ):
-        name = '"get_%s"' % self.alias
-        function = '(%s)(&%s)' % ( self.wrapper.getter_type.decl_string,
-                self.wrapper.getter_full_name )
-        args = [name, function]
-        if (self.declaration.getter_call_policies
-                and not self.declaration.getter_call_policies.is_default()):
-            args.append(self.declaration.getter_call_policies.create( self ))
-        else:
-            args[-1] += os.linesep + self.indent( '/* undefined call policies */', 2 )
-        if self.documentation:
-            args.append(self.documentation)
-        return self._create_def(args)
-
-    def _create_setter( self ):
-        name = '"set_%s"' % self.alias
-        function = '(%s)(&%s)' % ( self.wrapper.setter_type.decl_string,
-                self.wrapper.setter_full_name )
-        args = [name, function]
-        if (self.declaration.setter_call_policies
-                and not self.declaration.setter_call_policies.is_default()):
-            args.append(self.declaration.getter_call_policies.create( self ))
-        else:
-            args[-1] += os.linesep + self.indent( '/* undefined call policies */', 2 )
-        if self.documentation:
-            args.append(self.documentation)
-        return self._create_def(args)
-
-    def _create_impl( self ):
-        #TODO: fix me, should not force class scope usage
-        answer = []
-        class_var_name = self.parent.class_var_name
-        answer.append( "%s.%s;" % (class_var_name, self._create_getter() ) )
-        if self.wrapper.has_setter:
-            answer.append( os.linesep )
-            answer.append( "%s.%s;" % (class_var_name, self._create_setter() ) )
-        return ''.join( answer )
+            return self._create_with_def()
 
 class member_variable_wrapper_t( code_creator.code_creator_t
                                  , declaration_based.declaration_based_t ):
@@ -269,6 +195,10 @@ class member_variable_wrapper_t( code_creator.code_creator_t
                 return_type=self._get_var_type()
                 , arguments_types=arguments_types)
     getter_type = property( _get_getter_type )
+
+    def _get_getter_return_policy(self):
+        return call_policies.return_internal_reference().create( self )
+    getter_call_policy = property(_get_getter_return_policy)
 
     def _get_setter_full_name(self):
         return self.parent.full_name + '::' + 'set_' + self.declaration.name

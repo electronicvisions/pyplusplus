@@ -110,7 +110,6 @@ from member_variable import bit_field_t
 from member_variable import bit_field_wrapper_t
 from member_variable import array_mv_t
 from member_variable import array_mv_wrapper_t
-from member_variable import mem_var_ref_t
 from member_variable import mem_var_ref_wrapper_t
 from member_variable import member_variable_addressof_t
 from member_variable import fields_definition_t
