@@ -8,6 +8,7 @@ import sys
 import ctypes
 import unittest
 import fundamental_tester_base
+from pyplusplus.module_builder import call_policies
 
 class tester_t(fundamental_tester_base.fundamental_tester_base_t):
     EXTENSION_NAME = 'member_variables'
@@ -25,6 +26,7 @@ class tester_t(fundamental_tester_base.fundamental_tester_base_t):
         image.variable( 'data' ).expose_address = True
         image.variable( 'none_image' ).expose_address = True
         mb.class_( 'Andy' ).variable('userData').expose_address = True
+        mb.class_('D').variable('a').getter_call_policies = call_policies.return_internal_reference()
 
     def change_default_color( self, module ):
         module.point.default_color = module.point.color.blue
@@ -121,6 +123,28 @@ class tester_t(fundamental_tester_base.fundamental_tester_base_t):
         self.assertTrue( len( module.array_t.vars_nonconst ) == 3 )
         for i in range( len( module.array_t.vars_nonconst ) ):
             self.assertTrue( module.array_t.vars_nonconst[i].value == -9 )
+
+        a = module.A()
+        a.data = 23
+        b = module.B(a) # Returns by copy
+        c = module.C(a) # Returns by copy
+        d = module.D(a) # Returns internal ref
+
+        # B returns copy
+        tmp_a = b.a
+        self.assertTrue(tmp_a.data == a.data)
+        tmp_a.data = 42
+        self.assertTrue(tmp_a.data != a.data)
+
+        # D returns internal ref
+        tmp_a = d.a
+        self.assertTrue(tmp_a.data == d.a.data)
+        tmp_a.data = 42
+        self.assertTrue(tmp_a.data == d.a.data)
+
+        # C hold read only reference
+        with self.assertRaises(AttributeError):
+            c.a = module.A()
 
 def create_suite():
     suite = unittest.TestSuite()

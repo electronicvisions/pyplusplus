@@ -726,7 +726,7 @@ class bpcreator_t( declarations.decl_visitor_t ):
                 if None is self.curr_decl.setter_call_policies:
                     self.curr_decl.setter_call_policies = self.__call_policies_resolver( self.curr_decl, 'set' )
                 wrapper = code_creators.mem_var_ref_wrapper_t( variable=self.curr_decl )
-                maker = code_creators.mem_var_ref_t( variable=self.curr_decl, wrapper=wrapper )
+                maker = code_creators.member_variable_t( variable=self.curr_decl, wrapper=wrapper )
                 self.__opaque_types_manager.register_opaque( maker, self.curr_decl )
             else:
                 maker = code_creators.member_variable_t( variable=self.curr_decl )
