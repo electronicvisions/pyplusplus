@@ -62,11 +62,11 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
         return self._target_decl
 
     @property
-    def is_directive( self ):
-        if None is self.__is_directive:
-            dpath = declarations.declaration_path( self )
-            if len( dpath ) != 4:
-                self.__is_directive = False
-            else:
-                self.__is_directive = dpath[:3] == ['::', 'pyplusplus', 'aliases']
-        return self.__is_directive
+    def import_from_module(self):
+        return getattr(self, '_import_from_module', None)
+
+    @import_from_module.setter
+    def import_from_module(self, module):
+        self._import_from_module = module
+
+

@@ -33,26 +33,31 @@ class typedef_t( registration_based.registration_based_t
             declarations.double_t,
             declarations.long_double_t,
     )
+
+
+    def _bp_func(self, identifier, args = []):
+        return 'bp::' + identifier + '(' + ', '.join(args) + ')'
+
     def __init__(self, typedef):
         registration_based.registration_based_t.__init__( self )
         declaration_based.declaration_based_t.__init__( self, declaration=typedef)
         self.works_on_instance = False
 
-    def _gen_attr_access(self, decl):
+    def _gen_attr_access(self, decl, bp_fun=('scope',[])):
 
         # Schauder .... (don't know how to make it poperly :( )
         if isinstance(decl, declarations.bool_t):
-            return '::boost::python::eval("bool")'
+            return self._bp_func('eval', ['"bool"'])
         elif isinstance(decl, self.INT_TYPES):
-            return '::boost::python::eval("int")'
+            return self._bp_func('eval', ['"int"'])
         elif isinstance(decl, self.FLOAT_TYPES):
-            return '::boost::python::eval("float")'
+            return self._bp_func('eval', ['"float"'])
         else:
             ret = []
             while not isinstance(decl, declarations.namespace_t):
                 ret.append('attr("%s")' % decl.alias)
                 decl = decl.parent
-            ret.append('::boost::python::scope()')
+            ret.append(self._bp_func(*bp_fun))
             return ".".join(reversed(ret))
 
     def _create_impl(self):
@@ -61,8 +66,13 @@ class typedef_t( registration_based.registration_based_t
 
         data = {
             "td_alias" : self._gen_attr_access(self.declaration),
-            "target_alias" : self._gen_attr_access(self.declaration.target_decl),
         }
+
+        if self.declaration.import_from_module:
+            data["target_alias"] = self._gen_attr_access(self.declaration.target_decl,
+                    ('import', ['"%s"' % self.declaration.import_from_module]))
+        else:
+            data["target_alias"] = self._gen_attr_access(self.declaration.target_decl)
 
         # Print exception but allow loading to continue.
         typedef_code = []
