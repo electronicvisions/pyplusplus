@@ -156,7 +156,8 @@ namespace boost { namespace python { namespace indexing {
 		 typedef typename base_class::value_traits_type value_traits_type;
 
 		 typedef BOOST_DEDUCED_TYPENAME mpl::if_<
-			 is_fundamental<BOOST_DEDUCED_TYPENAME base_class::value_type>,
+			 mpl::or_<is_fundamental<BOOST_DEDUCED_TYPENAME base_class::value_type>
+				, is_enum<BOOST_DEDUCED_TYPENAME base_class::value_type> >,
 			 default_container_policies,
 			 return_internal_reference<>
 				 >::type policy_type;
