@@ -136,18 +136,38 @@ class class_t( scoped.scoped_t, registration_based.registration_based_t ):
     def _get_base_operators(self, base_classes, base_creators):
         #May be in future I will redefine operators on wrapper class
         #thus I will support [protected|private] [ [not|pure|] virtual] operators.
+
         operator_creators = []
         for base_creator in base_creators.values():
             hierarchy_info = base_classes[ id( base_creator.declaration )]
             if hierarchy_info.access_type != declarations.ACCESS_TYPES.PUBLIC:
                 continue
-            base_operator_creators = filter( lambda creator:
-                                                isinstance( creator, calldef.operator_t )
-                                                and isinstance( creator.declaration, declarations.member_operator_t )
-                                                and creator.declaration.access_type
-                                                    == declarations.ACCESS_TYPES.PUBLIC
-                                             , base_creator.creators )
-            operator_creators.extend( base_operator_creators )
+            for creator in base_creator.creators:
+                try:
+                    if creator.declaration.access_type != declarations.ACCESS_TYPES.PUBLIC:
+                        continue
+                except AttributeError:
+                    pass
+
+                if isinstance(creator, (calldef.casting_member_operator_t, calldef.casting_operator_t)):
+                    operator_creators.append(creator)
+                elif isinstance(creator, calldef.operator_t):# and isinstance(decl, declarations.member_operator_t):
+                    try:
+                        decl = creator.declaration
+                        self.declaration.member_operators(symbol=decl.symbol)
+                        # Found a member operator that shadows the creator of the base class
+                        continue
+                    except (AttributeError, RuntimeError):
+                        operator_creators.append(creator)
+                        pass
+
+            #base_operator_creators = filter( lambda creator:
+            #                                    isinstance( creator, calldef.operator_t )
+            #                                    and isinstance( creator.declaration, operators_to_use)
+            #                                    and creator.declaration.access_type
+            #                                        == declarations.ACCESS_TYPES.PUBLIC
+            #                                 , base_creator.creators )
+            #operator_creators.extend( base_operator_creators )
         return operator_creators
 
     def _generate_noncopyable(self):
@@ -243,7 +263,7 @@ class class_t( scoped.scoped_t, registration_based.registration_based_t ):
         result.append( class_constructor )
         creators = self.creators
         if self.declaration.redefine_operators:
-            creators = self.creators + self._get_base_operators(base_classes, base_creators)
+            creators += self._get_base_operators(base_classes, base_creators)
         for x in creators:
             if not ( x is used_init ):
                 code = x.create()
@@ -285,7 +305,7 @@ class class_t( scoped.scoped_t, registration_based.registration_based_t ):
 
         creators = self.creators
         if self.declaration.redefine_operators:
-            creators = self.creators + self._get_base_operators(base_classes, base_creators)
+            creators += self._get_base_operators(base_classes, base_creators)
 
         for x in creators:
             if x is used_init:
