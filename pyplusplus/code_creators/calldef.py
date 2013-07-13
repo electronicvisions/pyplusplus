@@ -1263,12 +1263,21 @@ class casting_member_operator_t( registration_based.registration_based_t
         if self.documentation:
             doc = ', %s' % self.documentation
 
-        return template % { 'function_name' : self.declaration.alias
+        aliases = [self.declaration.alias]
+        if self.declaration.alias in ('__int__', '__long__'):
+            aliases = ('__int__', '__long__')
+
+        result = []
+        for alias in aliases:
+            result.append(
+                template % { 'function_name' : alias
                             , 'class_name' : class_name
                             , 'destination_type' : self.declaration.return_type.partial_decl_string
                             , 'call_policies' : policies
                             , 'doc' : doc
                }
+            )
+        return ".\n".join(result)
 
     def _get_system_files_impl( self ):
         return []
