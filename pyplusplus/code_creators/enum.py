@@ -33,7 +33,9 @@ class enum_t( registration_based.registration_based_t
 
     def _generate_value_code(self, value_name):
         #in C++ you can't write namespace::enum::value, you should write namespace::value
-        full_name = self.declaration.decl_string
+        full_name = self.declaration.parent.decl_string
+        if self._cplusplus_revision >= 201103: #C++11
+            full_name = self.declaration.decl_string
         return '.value("%(alias)s", %(name)s)' \
                % { 'alias' : self.value_aliases.get( value_name, value_name )
                     , 'name' : algorithm.create_identifier( self, full_name + '::' + value_name ) }
