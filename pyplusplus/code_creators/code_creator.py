@@ -38,8 +38,6 @@ class code_creator_t(object):
         self._target_configuration = None
         self._works_on_instance = True
         self._code_generator = None
-        # 199711(C++98), 201103(C++11)
-        self._cplusplus_revision = 201103 # TODO: add interface to this :)
 
     @property
     def code_generator( self ):
