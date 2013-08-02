@@ -50,6 +50,7 @@ class builder_t(module_builder.module_builder_t):
                   , cflags=""
                   , encoding='ascii'
                   , compiler=None
+                  , cplusplus_revision=201103
                   , gccxml_config=None
                   , xml_generator_config=None):
         """
@@ -71,6 +72,8 @@ class builder_t(module_builder.module_builder_t):
         :param undefine_symbols: list of strings
 
         :param cflags: Raw string to be added to xml generator command line.
+
+        :param cplusplus_revision: Define C++ standard for code generation [199711(C++98), 201103(C++11)]
 
         :param xml_generator_config: instance of pygccxml.parser.xml_generator_configuration_t class, holds
                               xml generator configuration. You can use this
@@ -120,6 +123,8 @@ class builder_t(module_builder.module_builder_t):
 
         self.__registrations_code_head = []
         self.__registrations_code_tail = []
+        # modify code_creator base class: add c++ revision information
+        code_creators.code_creator_t._cplusplus_revision = cplusplus_revision
 
 
 
