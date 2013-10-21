@@ -55,7 +55,7 @@ def split_sequence(seq, bucket_size):
 
 
 class exposed_decls_db_t( object ):
-    DEFAULT_FILE_NAME = 'exposed_decl.pypp.txt'
+    DEFAULT_FILE_NAME = '%s.exposed_decl.pypp.txt'
     class row_t( declarations.decl_visitor_t ):
         FIELD_DELIMITER = '@'
         EXPOSED_DECL_SIGN = '+'
@@ -67,6 +67,7 @@ class exposed_decls_db_t( object ):
             self.signature = ''
             self.exposed_sign = ''
             self.normalized_name = ''
+            self.alias = ''
             if isinstance( decl_or_string, declarations.declaration_t ):
                 self.__init_from_decl( decl_or_string )
             else:
@@ -82,8 +83,14 @@ class exposed_decls_db_t( object ):
             else: #this should nevere happen
                 raise RuntimeError( "Unable to create normalized name for declaration: " + str(declaration))
 
+        def find_alias(self, decl):
+            if self.FIELD_DELIMITER in self.alias:
+                raise RuntimeError("invalid character in alias")
+            else:
+                return decl.alias
+
         def __init_from_str( self, row ):
-            self.exposed_sign, self.key, self.normalized_name, self.signature \
+            self.exposed_sign, self.key, self.normalized_name, self.signature, self.alias \
                 = row.split( self.FIELD_DELIMITER )
 
         def update_key( self, cls ):
@@ -102,38 +109,40 @@ class exposed_decls_db_t( object ):
                 self.signature = self.signature + declaration.function_type().decl_string
 
             self.normalized_name = self.find_out_normalized_name( declaration )
+            self.alias = self.find_alias(declaration)
 
         def __str__( self ):
             return self.FIELD_DELIMITER.join([ self.exposed_sign
                                                , self.key
                                                , self.normalized_name
-                                               , self.signature])
+                                               , self.signature
+                                               , self.alias])
 
-    def __init__( self ):
+    def __init__( self, module_name ):
         self.__registry = {} # key : { name : set(row) }
         self.__row_delimiter = os.linesep
+        self.__module_name = module_name
+
+    def __file_name(self, fpath):
+        if os.path.isdir( fpath ):
+            fpath = os.path.join(fpath, self.DEFAULT_FILE_NAME % self.__module_name)
+        return fpath
 
     def save( self, fpath ):
-        if os.path.isdir( fpath ):
-            fpath = os.path.join( fpath, self.DEFAULT_FILE_NAME )
-        f = open( fpath, 'w+b' )
-        for name2rows in self.__registry.values():
-            for rows in name2rows.values():
-                for row in rows:
-                    f.write( ('%s%s' % ( str(row), self.__row_delimiter )).encode('utf-8') )
-        f.close()
+        with open( self.__file_name(fpath), 'w+b' ) as f:
+            for name2rows in self.__registry.values():
+                for rows in name2rows.values():
+                    for row in rows:
+                        f.write( '%s%s' % ( str(row), self.__row_delimiter ) )
 
     def load( self, fpath ):
-        if os.path.isdir( fpath ):
-            fpath = os.path.join( fpath, self.DEFAULT_FILE_NAME )
-        f = open( fpath, 'r+b' )
-        for line in f:
-            line = line.decode('utf-8')
-            row = self.row_t( line.replace( self.__row_delimiter, '' ) )
-            self.__update_registry( row )
+        with open( self.__file_name(fpath), 'r+b' ) as f:
+            for line in f:
+                row = self.row_t( line.replace( self.__row_delimiter, '' ) )
+                self.__update_registry( row )
 
     def __update_registry( self, row ):
-        if row.key not in self.__registry:
+        if not self.__registry.has_key( row.key ):
             self.__registry[ row.key ] = { row.normalized_name : [row] }
         else:
             if row.normalized_name not in self.__registry[ row.key ]:
@@ -178,10 +187,12 @@ class exposed_decls_db_t( object ):
                 continue
             if self.row_t.EXPOSED_DECL_SIGN == row.exposed_sign:
                 declaration.ignore = False
-                declaration.already_exposed = True
+                declaration.already_exposed = self.__module_name
+                declaration.alias = row.alias
             else:
                 declaration.ignore = True
                 declaration.already_exposed = False
+                declaration.alias = row.alias
 
     def register_decls( self, global_ns, special_decls ):
         """register decls in the database
