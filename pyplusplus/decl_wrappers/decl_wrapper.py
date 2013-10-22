@@ -93,7 +93,7 @@ class decl_wrapper_t(object):
     def set_already_exposed( self, value ):
         self._already_exposed = value
     already_exposed = property( get_already_exposed, set_already_exposed
-                                , doc="boolean flag, which says whether the declaration is already exposed or not" )
+                                , doc="flag, which says whether the declaration is already exposed or not. May be set to False, True or the name of the module the declaration is declared in" )
 
     def exclude( self, compilation_errors=False ):
         """exclude "self" and child declarations from being exposed.
