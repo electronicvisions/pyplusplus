@@ -20,7 +20,7 @@ class scopedef_t(decl_wrapper.decl_wrapper_t):
 
     def exclude( self, compilation_errors=False ):
         """exclude "self" and child declarations from being exposed.
-        
+
         If compile_time_errors is True, than only declarations, which will cause
         compilation error will be excluded
         """
@@ -36,8 +36,7 @@ class scopedef_t(decl_wrapper.decl_wrapper_t):
                 map( lambda decl: decl.exclude(compilation_errors=True)
                      , self.declarations )
 
-    def include( self, already_exposed=False  ):
+    def include( self ):
         """Include "self" and child declarations to be exposed."""
         self.ignore = False
-        self.already_exposed = already_exposed
-        map( lambda decl: decl.include(already_exposed), self.declarations )
+        map( lambda decl: decl.include(), self.declarations )

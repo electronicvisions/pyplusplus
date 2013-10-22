@@ -105,13 +105,12 @@ class decl_wrapper_t(object):
         """
         self.ignore = True
 
-    def include( self, already_exposed=False ):
+    def include( self ):
         """include "self" and child declarations to be exposed.
 
         Code generators: ctypes, Boost.Python.
         """
         self.ignore = False
-        self.already_exposed = already_exposed
 
     def why_not_exportable( self ):
         """return the reason( string ) that explains why this declaration could not be exported

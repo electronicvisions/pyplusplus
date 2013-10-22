@@ -39,6 +39,11 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
             cpptypes.long_double_t,
     )
 
+    ALREADY_EXPOSED_TYPES = (
+            class_wrapper.class_t,
+            class_wrapper.class_declaration_t,
+    )
+
     def __init__(self, *arguments, **keywords):
         declarations.typedef_t.__init__(self, *arguments, **keywords )
         decl_wrapper.decl_wrapper_t.__init__( self )
@@ -46,6 +51,9 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
         self.__is_directive = None
 
     def _exportable_impl( self ):
+        if isinstance(self.target_decl, self.ALREADY_EXPOSED_TYPES):
+            if self.target_decl.already_exposed:
+                return ''
         if not isinstance(self.target_decl, self.EXPORTABLE_TYPES):
             return messages.W1066 % str( self )
         try:
@@ -63,7 +71,15 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
 
     @property
     def import_from_module(self):
-        return getattr(self, '_import_from_module', None)
+        try:
+            return self._import_from_module
+        except AttributeError:
+            target_already_exposed = getattr(self.target_decl, 'already_exposed', False)
+            if isinstance(target_already_exposed, basestring):
+                self._import_from_module = target_already_exposed
+            else:
+                self._import_from_module = None
+            return self._import_from_module
 
     @import_from_module.setter
     def import_from_module(self, module):
