@@ -9,6 +9,7 @@ tree.
 """
 import os
 import math
+from collections import defaultdict
 from pygccxml import declarations
 from pyplusplus import code_creators
 
@@ -58,30 +59,30 @@ class exposed_decls_db_t( object ):
     DEFAULT_FILE_NAME = '%s.exposed_decl.pypp.txt'
     class row_t( declarations.decl_visitor_t ):
         FIELD_DELIMITER = '@'
+        ALREADY_EXPOSED_DECL_SIGN = '-'
         EXPOSED_DECL_SIGN = '+'
         UNEXPOSED_DECL_SIGN = '~'
         CALLDEF_SIGNATURE_DELIMITER = '#'
 
         def __init__( self, decl_or_string ):
             self.key = ''
-            self.signature = ''
             self.exposed_sign = ''
-            self.normalized_name = ''
+            self.mangled_name = ''
             self.alias = ''
             if isinstance( decl_or_string, declarations.declaration_t ):
                 self.__init_from_decl( decl_or_string )
             else:
                 self.__init_from_str( decl_or_string )
 
-        def find_out_normalized_name( self, declaration ):
-            if declaration.name:
-                return declaration.partial_name
+        def find_out_mangled_name( self, declaration ):
+            if declaration.mangled:
+                return declaration.mangled
             elif declaration.location:#unnamed enums, classes, unions
                 return str( declaration.location.as_tuple() )
             elif isinstance( declaration, declarations.namespace_t ):
                 return '' #I don't really care about unnamed namespaces
             else: #this should nevere happen
-                raise RuntimeError( "Unable to create normalized name for declaration: " + str(declaration))
+                raise RuntimeError( "Unable to create mangled name for declaration: " + str(declaration))
 
         def find_alias(self, decl):
             if self.FIELD_DELIMITER in self.alias:
@@ -90,36 +91,34 @@ class exposed_decls_db_t( object ):
                 return decl.alias
 
         def __init_from_str( self, row ):
-            self.exposed_sign, self.key, self.normalized_name, self.signature, self.alias \
+            self.exposed_sign, self.key, self.mangled_name, self.alias \
                 = row.split( self.FIELD_DELIMITER )
 
         def update_key( self, cls ):
             self.key = cls.__name__
 
         def __init_from_decl( self, declaration ):
-            if declaration.ignore:
+            if declaration.already_exposed:
+                self.exposed_sign = self.ALREADY_EXPOSED_DECL_SIGN
+            elif declaration.ignore:
                 self.exposed_sign = self.UNEXPOSED_DECL_SIGN
             else:
                 self.exposed_sign = self.EXPOSED_DECL_SIGN
 
             self.update_key( declaration.__class__ )
 
-            self.signature = declaration.create_decl_string( with_defaults=False )
-            if isinstance( declaration, declarations.calldef_t ):
-                self.signature = self.signature + declaration.function_type().decl_string
-
-            self.normalized_name = self.find_out_normalized_name( declaration )
+            self.mangled_name = self.find_out_mangled_name( declaration )
             self.alias = self.find_alias(declaration)
 
         def __str__( self ):
             return self.FIELD_DELIMITER.join([ self.exposed_sign
                                                , self.key
-                                               , self.normalized_name
-                                               , self.signature
+                                               , self.mangled_name
                                                , self.alias])
 
     def __init__( self, module_name ):
-        self.__registry = {} # key : { name : set(row) }
+        # ECM: might need py2to3
+        self.__registry = defaultdict(lambda: defaultdict(list))# key : { name : set(row) }
         self.__row_delimiter = os.linesep
         self.__module_name = module_name
 
@@ -142,20 +141,13 @@ class exposed_decls_db_t( object ):
                 self.__update_registry( row )
 
     def __update_registry( self, row ):
-        if not self.__registry.has_key( row.key ):
-            self.__registry[ row.key ] = { row.normalized_name : [row] }
-        else:
-            if row.normalized_name not in self.__registry[ row.key ]:
-                self.__registry[ row.key ][row.normalized_name] = [row]
-            else:
-                self.__registry[ row.key ][row.normalized_name].append(row)
+        self.__registry[ row.key ][row.mangled_name].append(row)
 
     def __find_row_in_registry( self, row ):
         try:
-            return next(rrow for rrow in self.__registry[ row.key ][ row.normalized_name ]
+            return next(rrow for rrow in self.__registry[ row.key ][ row.mangled_name ]
                 if (rrow.key == row.key and
-                    rrow.signature == row.signature and
-                    rrow.normalized_name == row.normalized_name))
+                    rrow.mangled_name == row.mangled_name))
         except (KeyError, StopIteration):
             return None
 
@@ -184,6 +176,8 @@ class exposed_decls_db_t( object ):
         for declaration in global_ns.decls():
             row = self.__find_in_registry( declaration )
             if not row:
+                continue
+            if self.row_t.ALREADY_EXPOSED_DECL_SIGN == row.exposed_sign:
                 continue
             if self.row_t.EXPOSED_DECL_SIGN == row.exposed_sign:
                 declaration.ignore = False
