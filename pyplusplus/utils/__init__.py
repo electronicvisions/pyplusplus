@@ -189,7 +189,7 @@ class exposed_decls_db_t( object ):
                 declaration.ignore = False
                 declaration.already_exposed = self.__module_name
                 declaration.alias = row.alias
-            else:
+            elif not decl.already_exposed:
                 declaration.ignore = True
                 declaration.already_exposed = False
                 declaration.alias = row.alias
