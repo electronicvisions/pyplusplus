@@ -195,7 +195,7 @@ class exposed_decls_db_t( object ):
                 decl.ignore = False
                 decl.already_exposed = self.__module_name
                 decl.alias = row.alias
-            else:
+            elif not decl.already_exposed:
                 decl.ignore = True
                 decl.already_exposed = False
                 decl.alias = row.alias
