@@ -173,3 +173,11 @@ class module_builder_t(object):
     def free_operators( self, *args, **kwargs ):
         """Please see :class:`decl_wrappers.namespace_t` class documentation"""
         return self.global_ns.free_operators( *args, **kwargs )
+
+    def typedef( self, *args, **kwargs ):
+        """Please see :class:`decl_wrappers.namespace_t` class documentation"""
+        return self.global_ns.typedef( *args, **kwargs )
+
+    def typedefs( self, *args, **kwargs ):
+        """Please see :class:`decl_wrappers.namespace_t` class documentation"""
+        return self.global_ns.typedefs( *args, **kwargs )
