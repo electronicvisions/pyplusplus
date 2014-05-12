@@ -8,6 +8,7 @@ from . import code_creator
 from . import declaration_based
 from . import registration_based
 from pygccxml import declarations
+from pygccxml.declarations import type_traits
 
 class typedef_t( registration_based.registration_based_t
               , declaration_based.declaration_based_t ):
@@ -44,6 +45,14 @@ class typedef_t( registration_based.registration_based_t
         self.works_on_instance = False
 
     def _gen_attr_access(self, decl, bp_fun=('scope',[])):
+        ret = []
+        while not isinstance(decl, declarations.namespace_t):
+            ret.append('attr("%s")' % decl.alias)
+            decl = decl.parent
+        ret.append(self._bp_func(*bp_fun))
+        return ".".join(reversed(ret))
+
+    def _gen_attr_access_target(self, decl, bp_fun=('scope',[])):
 
         # Schauder .... (don't know how to make it poperly :( )
         if isinstance(decl, declarations.bool_t):
@@ -52,13 +61,10 @@ class typedef_t( registration_based.registration_based_t
             return self._bp_func('eval', ['"int"'])
         elif isinstance(decl, self.FLOAT_TYPES):
             return self._bp_func('eval', ['"float"'])
+        elif type_traits.is_std_string(decl):
+            return self._bp_func('eval', ['"str"'])
         else:
-            ret = []
-            while not isinstance(decl, declarations.namespace_t):
-                ret.append('attr("%s")' % decl.alias)
-                decl = decl.parent
-            ret.append(self._bp_func(*bp_fun))
-            return ".".join(reversed(ret))
+            return self._gen_attr_access(decl, bp_fun)
 
     def _create_impl(self):
         if self.declaration.already_exposed:
@@ -69,10 +75,12 @@ class typedef_t( registration_based.registration_based_t
         }
 
         if self.declaration.import_from_module:
-            data["target_alias"] = self._gen_attr_access(self.declaration.target_decl,
+            data["target_alias"] = self._gen_attr_access_target(
+                    self.declaration.target_decl,
                     ('import', ['"%s"' % self.declaration.import_from_module]))
         else:
-            data["target_alias"] = self._gen_attr_access(self.declaration.target_decl)
+            data["target_alias"] = self._gen_attr_access_target(
+                    self.declaration.target_decl)
 
         # Print exception but allow loading to continue.
         typedef_code = []
