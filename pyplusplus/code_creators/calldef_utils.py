@@ -64,7 +64,7 @@ class argument_utils_t:
                         #registration order
                         result.append( '=(long)(%s)' % arg.default_value )
                     else:
-                        result.append( '=%s' % arg.default_value )
+                        result.append( '=(%s)' % arg.default_value )
                 else:
                     result.append( '=%s()' % boost_obj )
         result.append( ' )' )
@@ -82,7 +82,7 @@ class argument_utils_t:
         for index, arg in enumerate( self.__args ):
             result = arg.type.partial_decl_string + ' ' + self.argument_name(index)
             if arg.default_value:
-                result += '=%s' % arg.default_value
+                result += '=(%s)' % arg.default_value
             args.append( result )
         if len( args ) == 1:
             return args[ 0 ]
