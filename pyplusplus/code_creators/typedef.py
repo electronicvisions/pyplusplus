@@ -66,6 +66,18 @@ class typedef_t( registration_based.registration_based_t
         else:
             return self._gen_attr_access(decl, bp_fun)
 
+    def _get_alias(self, decl):
+        if isinstance(decl, declarations.bool_t):
+            return "bool"
+        elif isinstance(decl, self.INT_TYPES):
+            return "int"
+        elif isinstance(decl, self.FLOAT_TYPES):
+            return "float"
+        elif type_traits.is_std_string(decl):
+            return "str"
+        else:
+            return decl.alias
+
     def _create_impl(self):
         if self.declaration.already_exposed:
             return ''
@@ -81,15 +93,29 @@ class typedef_t( registration_based.registration_based_t
         else:
             data["target_alias"] = self._gen_attr_access_target(
                     self.declaration.target_decl)
-
-        # Print exception but allow loading to continue.
-        typedef_code = []
-        typedef_code.append('try {')
-        typedef_code.append('%(td_alias)s = %(target_alias)s;' % data)
-        typedef_code.append('} catch(bp::error_already_set) {')
-        typedef_code.append('if (PyErr_Occurred()) PyErr_Print();')
-        typedef_code.append('}')
-
+        # A python warning is issued, when the target decl can not be found in
+        # the module. All other errors are passed to the user.
+        typedef_code = [
+            'try {',
+            self.indent('%(td_alias)s = %(target_alias)s;' % data),
+            '} catch(bp::error_already_set) {',
+            self.indent('if (!PyErr_ExceptionMatches(PyExc_AttributeError)) {'),
+            self.indent('PySys_WriteStderr("Unexpected python exception, while'
+                        ' creating a typedef alias");', 2),
+            self.indent('PyErr_Print();', 2),
+            self.indent('} else {'),
+            self.indent('PyErr_Clear();', 2),
+            self.indent('if(PyErr_WarnEx(PyExc_RuntimeWarning, "Wrapping error:'
+                        ' base type %s (wrapped as %s) for typedef %s was not'
+                        ' found", 0) == -1) {' % (
+                            self.declaration.target_decl.partial_decl_string,
+                            self._get_alias(self.declaration.target_decl),
+                            self.declaration.partial_decl_string), 2),
+            self.indent('throw;', 3),
+            self.indent('}', 2),
+            self.indent('}'),
+            '}',
+        ]
         return os.linesep.join(typedef_code)
 
     def _get_system_files_impl( self ):
