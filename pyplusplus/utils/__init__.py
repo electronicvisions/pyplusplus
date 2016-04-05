@@ -9,6 +9,7 @@ tree.
 """
 import os
 import math
+import base64
 from collections import defaultdict
 from pygccxml import declarations
 from pyplusplus import code_creators
@@ -77,8 +78,13 @@ class exposed_decls_db_t( object ):
         def find_out_mangled_name( self, declaration ):
             if declaration.mangled:
                 return declaration.mangled
-            elif declaration.location:#unnamed enums, classes, unions
-                return str( declaration.location.as_tuple() )
+            elif declaration.location:
+                # For unnamed enums, classes and unions or not mangled types
+                # like typedefs
+                # Note base64.encodestring always adds a newline, that we have
+                # to strip
+                filename, line = declaration.location.as_tuple()
+                return "%s:%s" % (base64.encodestring(filename)[:-1], line)
             elif isinstance( declaration, declarations.namespace_t ):
                 return '' #I don't really care about unnamed namespaces
             else: #this should nevere happen
