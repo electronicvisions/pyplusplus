@@ -81,10 +81,8 @@ class exposed_decls_db_t( object ):
             elif declaration.location:
                 # For unnamed enums, classes and unions or not mangled types
                 # like typedefs
-                # Note base64.encodestring always adds a newline, that we have
-                # to strip
                 filename, line = declaration.location.as_tuple()
-                return "%s:%s" % (base64.encodestring(filename)[:-1], line)
+                return "%s:%s" % (base64.b64encode(filename), line)
             elif isinstance( declaration, declarations.namespace_t ):
                 return '' #I don't really care about unnamed namespaces
             else: #this should nevere happen
