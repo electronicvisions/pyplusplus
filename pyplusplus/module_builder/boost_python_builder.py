@@ -149,7 +149,7 @@ class builder_t(module_builder.module_builder_t):
                 decls_package.namespace_matcher_t( name='::' )
                 , decls )
         if indexing_suite_version != 1:
-            for cls in global_ns.classes():
+            for cls in global_ns.classes(allow_empty=True):
                 cls.indexing_suite_version = indexing_suite_version
             for cls in global_ns.decls(decl_type=decls_package.class_declaration_t, allow_empty=True):
                 cls.indexing_suite_version = indexing_suite_version
