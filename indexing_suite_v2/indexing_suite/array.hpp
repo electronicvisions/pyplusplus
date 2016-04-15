@@ -18,14 +18,9 @@
 //
 // Indexing algorithms support for std::array instances
 //
-// History
-// =======
-//
-// $Id: deque.hpp,v 1.1.2.6 2004/02/08 18:57:42 raoulgough Exp $
-//
 
-#ifndef BOOST_PYTHON_INDEXING_DEQUE_HPP
-#define BOOST_PYTHON_INDEXING_DEQUE_HPP
+#ifndef BOOST_PYTHON_INDEXING_ARRAY_HPP
+#define BOOST_PYTHON_INDEXING_ARRAY_HPP
 
 #include <array>
 
@@ -217,19 +212,4 @@ struct array_suite
 
 } } }
 
-#endif // BOOST_PYTHON_INDEXING_DEQUE_HPP
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // BOOST_PYTHON_INDEXING_ARRAY_HPP
