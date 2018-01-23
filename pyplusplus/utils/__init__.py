@@ -81,7 +81,10 @@ class exposed_decls_db_t( object ):
                 # For unnamed enums, classes and unions or not mangled types
                 # like typedefs
                 filename, line = decl.location.as_tuple()
-                return "%s:%s" % (base64.b64encode(filename), line)
+                # Add mangled name of parent to distinguish instantiations
+                # within template classes
+                parent = self.find_out_mangled_name(decl.parent)
+                return "%s:%s:%s" % (parent,base64.b64encode(filename), line)
             elif isinstance( decl, declarations.namespace_t ):
                 return '' #I don't really care about unnamed namespaces
             else: #this should nevere happen
