@@ -62,10 +62,7 @@ namespace boost { namespace python { namespace indexing {
               >::value
 
             | detail::method_set_if<
-                  type_traits::ice_and<
-                      base_class::is_mutable,
-                      value_traits_type::less_than_comparable
-                  >::value,
+                  base_class::is_mutable && value_traits_type::less_than_comparable,
                   method_sort
               >::value
 
