@@ -30,7 +30,6 @@
 #include <boost/type_traits.hpp>
 #include <boost/call_traits.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/type_traits/ice.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
 namespace boost { namespace python { namespace indexing {
@@ -146,10 +145,7 @@ namespace boost { namespace python { namespace indexing {
               >::value
 
             | detail::method_set_if<
-                  type_traits::ice_and<
-                      base_class::is_mutable,
-                      value_traits_type::less_than_comparable
-                  >::value,
+                  base_class::is_mutable && value_traits_type::less_than_comparable,
                   method_sort
               >::value
 
