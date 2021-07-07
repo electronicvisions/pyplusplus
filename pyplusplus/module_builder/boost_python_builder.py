@@ -128,22 +128,22 @@ class builder_t(module_builder.module_builder_t):
 
 
 
-    def register_module_dependency( self, other_module_generated_code_dir ):
+    def register_module_dependency( self, other_module_generated_code_dir, module_name ):
         """
         `already_exposed` solution is pretty good when you mix hand-written
         modules with `Py++` generated. It doesn't work/scale for "true"
         multi-module development. This is exactly the reason why `Py++`
         offers "semi automatic" solution.
 
-        For every exposed module, `Py++` generates `exposed_decl.pypp.txt` file.
+        For every exposed module, `Py++` generates `<module_name>.exposed_decl.pypp.txt` file.
         This file contains the list of all parsed declarations and whether they
         were included or excluded. Later, when you work on another module, you
         can tell `Py++` that the current module depends on the previously
-        generated one. `Py++` will load `exposed_decl.pypp.txt` file and update
+        generated one. `Py++` will load `<module_name>.exposed_decl.pypp.txt` file and update
         the declarations.
         """
 
-        db = utils.exposed_decls_db_t()
+        db = utils.exposed_decls_db_t(module_name)
         db.load( other_module_generated_code_dir )
         db.update_decls( self.global_ns )
 

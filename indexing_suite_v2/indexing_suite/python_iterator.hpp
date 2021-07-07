@@ -32,7 +32,7 @@ namespace boost { namespace python { namespace indexing {
   {
     python_iterator (boost::python::object obj)
     : m_iter_obj (handle<> (PyObject_GetIter (obj.ptr()))),
-      m_next_method (m_iter_obj.attr ("next")),
+      m_next_method (m_iter_obj.attr ("__next__")),
       m_current()
     {
     }

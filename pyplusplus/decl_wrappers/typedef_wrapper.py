@@ -66,7 +66,7 @@ class typedef_t(decl_wrapper.decl_wrapper_t, declarations.typedef_t):
     @property
     def target_decl(self):
         if self._target_decl is None:
-            self._target_decl = type_traits.remove_declarated(self.type)
+            self._target_decl = type_traits.remove_declarated(self.decl_type)
         return self._target_decl
 
     @property

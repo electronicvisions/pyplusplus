@@ -37,7 +37,7 @@ class writer_t(object):
         self.__encoding=encoding
         if None is files_sum_repository:
             self.__files_sum_repository = md5sum_repository.dummy_repository_t()
-        self.__exposed_decls_db = utils.exposed_decls_db_t()
+        self.__exposed_decls_db = utils.exposed_decls_db_t(self.extmodule.body.name)
         self.__exposed_decls_db.register_decls( extmodule.global_ns
                                                 , extmodule.specially_exposed_decls )
 
@@ -162,7 +162,6 @@ class writer_t(object):
 
     def get_user_headers( self, creators ):
         headers = []
-        creators = [creator for creator in creators if isinstance( creator, code_creators.declaration_based_t )]
         for creator in code_creators.make_flatten_generator(creators):
             if isinstance( creator, code_creators.declaration_based_t ):
                 headers.extend(creator.get_user_headers())

@@ -85,7 +85,7 @@ class exposed_decls_db_t( object ):
                 # Add mangled name of parent to distinguish instantiations
                 # within template classes
                 parent = self.find_out_mangled_name(declaration.parent)
-                return "%s:%s:%s" % (parent,base64.b64encode(filename), line)
+                return "%s:%s:%s" % (parent,base64.b64encode(filename.encode("utf-8")), line)
             elif isinstance( declaration, declarations.namespace_t ):
                 return '' #I don't really care about unnamed namespaces
             else: #this should nevere happen
@@ -139,11 +139,12 @@ class exposed_decls_db_t( object ):
             for name2rows in self.__registry.values():
                 for rows in name2rows.values():
                     for row in rows:
-                        f.write( '%s%s' % ( str(row), self.__row_delimiter ) )
+                        f.write( ('%s%s' % ( str(row), self.__row_delimiter )).encode('utf-8') )
 
     def load( self, fpath ):
         with open( self.__file_name(fpath), 'r+b' ) as f:
             for line in f:
+                line = line.decode('utf-8')
                 row = self.row_t( line.replace( self.__row_delimiter, '' ) )
                 self.__update_registry( row )
 
@@ -190,7 +191,7 @@ class exposed_decls_db_t( object ):
                 declaration.ignore = False
                 declaration.already_exposed = self.__module_name
                 declaration.alias = row.alias
-            elif not decl.already_exposed:
+            elif not declaration.already_exposed:
                 declaration.ignore = True
                 declaration.already_exposed = False
                 declaration.alias = row.alias
