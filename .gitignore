@@ -1,0 +1,4 @@
+# Python stuff
+*.pyc
+.ropeproject/
+__pycache__/
